@@ -5,11 +5,23 @@ defmodule DoublyLinkedList do
 
   def new, do: %__MODULE__{}
 
-  def insert_head(%__MODULE__{} = dll, data), do: update_head(dll, data)
-  def insert_head({%__MODULE__{} = dll, _node}, data), do: update_head(dll, data)
+  def insert_head(%__MODULE__{head: head, tail: tail, nodes: nodes} = dll, data) do
+    node = Node.new(data, next: head)
+    nodes = nodes |> Map.put(node.__id__, node) |> update_head_pointer(head, node.__id__)
 
-  def insert_tail(%__MODULE__{} = dll, data), do: update_tail(dll, data)
-  def insert_tail({%__MODULE__{} = dll, _node}, data), do: update_tail(dll, data)
+    {%{dll | nodes: nodes, head: node.__id__, tail: tail || node.__id__}, node}
+  end
+
+  def insert_head({%__MODULE__{} = dll, _node}, data), do: insert_head(dll, data)
+
+  def insert_tail(%__MODULE__{head: head, tail: tail, nodes: nodes} = dll, data) do
+    node = Node.new(data, prev: tail)
+    nodes = nodes |> Map.put(node.__id__, node) |> update_tails(tail, node.__id__)
+
+    {%{dll | nodes: nodes, head: head || node.__id__, tail: node.__id__}, node}
+  end
+
+  def insert_tail({%__MODULE__{} = dll, _node}, data), do: insert_tail(dll, data)
 
   def insert_before(%__MODULE__{} = dll, before_node_id, data) when is_binary(before_node_id) do
     # TODO Handle raise
@@ -19,7 +31,7 @@ defmodule DoublyLinkedList do
 
   def insert_before(%__MODULE__{} = dll, %Node{} = before_node, data) do
     case Map.get(dll.nodes, before_node.prev) do
-      nil -> update_head(dll, data)
+      nil -> insert_head(dll, data)
       after_node -> update_inbetween(dll, after_node, before_node, data)
     end
   end
@@ -32,23 +44,9 @@ defmodule DoublyLinkedList do
 
   def insert_after(%__MODULE__{} = dll, %Node{} = after_node, data) do
     case Map.get(dll.nodes, after_node.next) do
-      nil -> update_tail(dll, data)
+      nil -> insert_tail(dll, data)
       before_node -> update_inbetween(dll, after_node, before_node, data)
     end
-  end
-
-  defp update_head(%__MODULE__{head: head, tail: tail, nodes: nodes} = dll, data) do
-    node = Node.new(data, next: head)
-    nodes = nodes |> Map.put(node.__id__, node) |> update_head_pointer(head, node.__id__)
-
-    {%{dll | nodes: nodes, head: node.__id__, tail: tail || node.__id__}, node}
-  end
-
-  defp update_tail(%__MODULE__{head: head, tail: tail, nodes: nodes} = dll, data) do
-    node = Node.new(data, prev: tail)
-    nodes = nodes |> Map.put(node.__id__, node) |> update_tails(tail, node.__id__)
-
-    {%{dll | nodes: nodes, head: head || node.__id__, tail: node.__id__}, node}
   end
 
   defp update_inbetween(%__MODULE__{} = dll, %Node{} = after_node, %Node{} = before_node, data) do
