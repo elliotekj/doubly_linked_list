@@ -94,4 +94,32 @@ defmodule DoublyLinkedListTest do
       assert map_size(dll.nodes) == 3
     end
   end
+
+  describe "insert_after/2" do
+    test "inserts after the node and becomes tail" do
+      {dll, tail_node} = %DLL{} |> DLL.insert_tail("test")
+      {dll, node} = DLL.insert_after(dll, tail_node, "test2")
+
+      head_node = Map.get(dll.nodes, dll.head)
+      node = Map.get(dll.nodes, node.__id__)
+      tail_node = Map.get(dll.nodes, dll.tail)
+
+      assert tail_node == node
+      assert node.prev == head_node.__id__
+      assert map_size(dll.nodes) == 2
+    end
+
+    test "inserts after the node" do
+      {dll, tail_node} = %DLL{} |> DLL.insert_head("test") |> DLL.insert_head("test2")
+      {dll, node} = DLL.insert_after(dll, tail_node, "test3")
+
+      head_node = Map.get(dll.nodes, dll.head)
+      node = Map.get(dll.nodes, node.__id__)
+      tail_node = Map.get(dll.nodes, dll.tail)
+
+      assert node.prev == head_node.__id__
+      assert node.next == tail_node.__id__
+      assert map_size(dll.nodes) == 3
+    end
+  end
 end

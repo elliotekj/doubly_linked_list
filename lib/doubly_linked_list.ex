@@ -11,8 +11,8 @@ defmodule DoublyLinkedList do
   def insert_tail(%__MODULE__{} = dll, data), do: update_tail(dll, data)
   def insert_tail({%__MODULE__{} = dll, _node}, data), do: update_tail(dll, data)
 
-  # TODO Make more robust
   def insert_before(%__MODULE__{} = dll, before_node_id, data) when is_binary(before_node_id) do
+    # TODO Handle raise
     before_node = Map.fetch!(dll.nodes, before_node_id)
     insert_before(dll, before_node, data)
   end
@@ -20,7 +20,20 @@ defmodule DoublyLinkedList do
   def insert_before(%__MODULE__{} = dll, %Node{} = before_node, data) do
     case Map.get(dll.nodes, before_node.prev) do
       nil -> update_head(dll, data)
-      after_node -> update_before(dll, after_node, before_node, data)
+      after_node -> update_inbetween(dll, after_node, before_node, data)
+    end
+  end
+
+  def insert_after(%__MODULE__{} = dll, after_node_id, data) when is_binary(after_node_id) do
+    # TODO Handle raise
+    after_node = Map.fetch!(dll.nodes, after_node_id)
+    insert_after(dll, after_node, data)
+  end
+
+  def insert_after(%__MODULE__{} = dll, %Node{} = after_node, data) do
+    case Map.get(dll.nodes, after_node.next) do
+      nil -> update_tail(dll, data)
+      before_node -> update_inbetween(dll, after_node, before_node, data)
     end
   end
 
@@ -38,7 +51,7 @@ defmodule DoublyLinkedList do
     {%{dll | nodes: nodes, head: head || node.__id__, tail: node.__id__}, node}
   end
 
-  defp update_before(%__MODULE__{} = dll, %Node{} = after_node, %Node{} = before_node, data) do
+  defp update_inbetween(%__MODULE__{} = dll, %Node{} = after_node, %Node{} = before_node, data) do
     node = Node.new(data, prev: after_node.__id__, next: before_node.__id__)
 
     nodes =
