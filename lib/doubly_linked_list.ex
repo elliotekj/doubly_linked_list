@@ -139,6 +139,15 @@ defmodule DoublyLinkedList do
     get(dll, node.__id__)
   end
 
+  def update(%__MODULE__{} = dll, node_id, data) when is_binary(node_id) do
+    nodes = Map.update!(dll.nodes, node_id, fn node -> %{node | data: data} end)
+    %{dll | nodes: nodes}
+  end
+
+  def update(%__MODULE__{} = dll, %Node{} = node, data) do
+    update(dll, node.__id__, data)
+  end
+
   # TODO
   # - remove before
   # - remove after

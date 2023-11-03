@@ -235,4 +235,13 @@ defmodule DoublyLinkedListTest do
       assert tail_node == node
     end
   end
+
+  describe "update/3" do
+    test "updated the data" do
+      {dll, tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test3")
+      dll = DLL.update(dll, tail_node, "test2")
+
+      assert DLL.get(dll, tail_node) |> Map.get(:data) == "test2"
+    end
+  end
 end
