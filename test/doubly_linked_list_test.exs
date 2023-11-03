@@ -122,4 +122,22 @@ defmodule DoublyLinkedListTest do
       assert map_size(dll.nodes) == 3
     end
   end
+
+  describe "remove_head/1" do
+    test "removes the node at the head of the list" do
+      {dll, tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
+      new_dll = DLL.remove_head(dll)
+
+      assert new_dll.head == tail_node.__id__
+      assert new_dll.tail == tail_node.__id__
+    end
+
+    test "removes the node when scaling to 0" do
+      {dll, _tail_node} = %DLL{} |> DLL.insert_tail("test")
+      new_dll = DLL.remove_head(dll)
+
+      assert new_dll.head |> is_nil()
+      assert new_dll.tail |> is_nil()
+    end
+  end
 end
