@@ -87,6 +87,34 @@ defmodule DoublyLinkedList do
 
   def remove_tail({%__MODULE__{} = dll, _node}), do: remove_tail(dll)
 
+  def remove_before(%__MODULE__{} = dll, before_node_id) when is_binary(before_node_id) do
+    with %{prev: prev} = before_node when prev != nil <- Map.get(dll.nodes, before_node_id),
+         %{prev: prev} = old_prev_node when prev != nil <- Map.get(dll.nodes, before_node.prev),
+         new_prev_node <- Map.get(dll.nodes, old_prev_node.prev) do
+      nodes =
+        dll.nodes
+        |> Map.delete(old_prev_node.__id__)
+        |> Map.put(new_prev_node.__id__, %{new_prev_node | next: before_node_id})
+        |> Map.put(before_node_id, %{before_node | prev: new_prev_node.__id__})
+
+      %{dll | nodes: nodes}
+    else
+      %{__id__: id, prev: nil} when id == before_node_id -> dll
+      # FIXME Double access for removing head
+      %{prev: nil, next: next} when next == before_node_id -> remove_head(dll)
+    end
+  end
+
+  def remove_before(%__MODULE__{} = dll, %Node{} = before_node) do
+    remove_before(dll, before_node.__id__)
+  end
+
+  # TODO
+  # - remove before
+  # - remove after
+  # - update
+  # - get a fresh copy of the node before using its attributes
+
   defp update_inbetween(%__MODULE__{} = dll, %Node{} = after_node, %Node{} = before_node, data) do
     node = Node.new(data, prev: after_node.__id__, next: before_node.__id__)
 

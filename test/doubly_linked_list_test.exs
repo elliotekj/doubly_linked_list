@@ -130,6 +130,7 @@ defmodule DoublyLinkedListTest do
 
       assert new_dll.head == tail_node.__id__
       assert new_dll.tail == tail_node.__id__
+      assert map_size(new_dll.nodes) == 1
     end
 
     test "removes the node when scaling to 0" do
@@ -138,6 +139,7 @@ defmodule DoublyLinkedListTest do
 
       assert new_dll.head |> is_nil()
       assert new_dll.tail |> is_nil()
+      assert map_size(new_dll.nodes) == 0
     end
   end
 
@@ -148,6 +150,7 @@ defmodule DoublyLinkedListTest do
 
       assert new_dll.head == head_node.__id__
       assert new_dll.tail == head_node.__id__
+      assert map_size(new_dll.nodes) == 1
     end
 
     test "removes the node when scaling to 0" do
@@ -156,6 +159,39 @@ defmodule DoublyLinkedListTest do
 
       assert new_dll.head |> is_nil()
       assert new_dll.tail |> is_nil()
+      assert map_size(new_dll.nodes) == 0
+    end
+  end
+
+  describe "remove_before/2" do
+    test "does nothing if the node is head" do
+      {dll, head_node} = %DLL{} |> DLL.insert_tail("test")
+      new_dll = DLL.remove_before(dll, head_node)
+
+      assert dll == new_dll
+    end
+
+    test "removes the node before" do
+      {dll, head_node} = %DLL{} |> DLL.insert_tail("test")
+      {dll, _middle_node} = DLL.insert_tail(dll, "test2")
+      {dll, tail_node} = DLL.insert_tail(dll, "test3")
+
+      new_dll = DLL.remove_before(dll, tail_node)
+
+      assert new_dll.head == head_node.__id__
+      assert new_dll.tail == tail_node.__id__
+      assert Map.get(new_dll.nodes, tail_node.__id__) |> Map.get(:prev) == head_node.__id__
+      assert map_size(new_dll.nodes) == 2
+    end
+
+    test "removes the node and becomes head" do
+      {dll, head_node} = %DLL{} |> DLL.insert_tail("test")
+      {dll, tail_node} = DLL.insert_tail(dll, "test2")
+      new_dll = DLL.remove_before(dll, tail_node)
+
+      assert new_dll.head == tail_node.__id__
+      assert new_dll.tail == tail_node.__id__
+      assert map_size(new_dll.nodes) == 1
     end
   end
 end
