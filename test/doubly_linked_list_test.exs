@@ -140,4 +140,22 @@ defmodule DoublyLinkedListTest do
       assert new_dll.tail |> is_nil()
     end
   end
+
+  describe "remove_tail/1" do
+    test "removes the node at the tail of the list" do
+      {dll, head_node} = %DLL{} |> DLL.insert_head("test") |> DLL.insert_head("test2")
+      new_dll = DLL.remove_tail(dll)
+
+      assert new_dll.head == head_node.__id__
+      assert new_dll.tail == head_node.__id__
+    end
+
+    test "removes the node when scaling to 0" do
+      {dll, _tail_node} = %DLL{} |> DLL.insert_tail("test")
+      new_dll = DLL.remove_tail(dll)
+
+      assert new_dll.head |> is_nil()
+      assert new_dll.tail |> is_nil()
+    end
+  end
 end

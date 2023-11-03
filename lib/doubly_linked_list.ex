@@ -68,6 +68,25 @@ defmodule DoublyLinkedList do
 
   def remove_head({%__MODULE__{} = dll, _node}), do: remove_head(dll)
 
+  def remove_tail(%__MODULE__{} = dll) do
+    case Map.get(dll.nodes, dll.tail) do
+      %{prev: nil} ->
+        new()
+
+      old_tail ->
+        new_tail = Map.get(dll.nodes, old_tail.prev)
+
+        nodes =
+          dll.nodes
+          |> Map.delete(dll.tail)
+          |> Map.put(new_tail.__id__, %{new_tail | next: nil})
+
+        %{dll | nodes: nodes, tail: new_tail.__id__}
+    end
+  end
+
+  def remove_tail({%__MODULE__{} = dll, _node}), do: remove_tail(dll)
+
   defp update_inbetween(%__MODULE__{} = dll, %Node{} = after_node, %Node{} = before_node, data) do
     node = Node.new(data, prev: after_node.__id__, next: before_node.__id__)
 
