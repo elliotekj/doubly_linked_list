@@ -131,6 +131,14 @@ defmodule DoublyLinkedList do
     remove_after(dll, after_node.__id__)
   end
 
+  def get(%__MODULE__{} = dll, node_id) when is_binary(node_id) do
+    Map.get(dll.nodes, node_id)
+  end
+
+  def get(%__MODULE__{} = dll, %Node{} = node) do
+    get(dll, node.__id__)
+  end
+
   # TODO
   # - remove before
   # - remove after

@@ -226,4 +226,13 @@ defmodule DoublyLinkedListTest do
       assert map_size(new_dll.nodes) == 1
     end
   end
+
+  describe "get/2" do
+    test "returns the node" do
+      {dll, tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
+      node = DLL.get(dll, tail_node)
+
+      assert tail_node == node
+    end
+  end
 end
