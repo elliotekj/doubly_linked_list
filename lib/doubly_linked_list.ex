@@ -109,6 +109,28 @@ defmodule DoublyLinkedList do
     remove_before(dll, before_node.__id__)
   end
 
+  def remove_after(%__MODULE__{} = dll, after_node_id) when is_binary(after_node_id) do
+    with %{next: next} = after_node when next != nil <- Map.get(dll.nodes, after_node_id),
+         %{next: next} = old_next_node when next != nil <- Map.get(dll.nodes, after_node.next),
+         new_next_node <- Map.get(dll.nodes, old_next_node.next) do
+      nodes =
+        dll.nodes
+        |> Map.delete(old_next_node.__id__)
+        |> Map.put(new_next_node.__id__, %{new_next_node | prev: after_node_id})
+        |> Map.put(after_node_id, %{after_node | next: new_next_node.__id__})
+
+      %{dll | nodes: nodes}
+    else
+      %{__id__: id, next: nil} when id == after_node_id -> dll
+      # FIXME Double access for removing head
+      %{prev: prev, next: nil} when prev == after_node_id -> remove_tail(dll)
+    end
+  end
+
+  def remove_after(%__MODULE__{} = dll, %Node{} = after_node) do
+    remove_after(dll, after_node.__id__)
+  end
+
   # TODO
   # - remove before
   # - remove after

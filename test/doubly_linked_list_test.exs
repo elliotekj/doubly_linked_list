@@ -185,12 +185,44 @@ defmodule DoublyLinkedListTest do
     end
 
     test "removes the node and becomes head" do
-      {dll, head_node} = %DLL{} |> DLL.insert_tail("test")
+      {dll, _head_node} = %DLL{} |> DLL.insert_tail("test")
       {dll, tail_node} = DLL.insert_tail(dll, "test2")
       new_dll = DLL.remove_before(dll, tail_node)
 
       assert new_dll.head == tail_node.__id__
       assert new_dll.tail == tail_node.__id__
+      assert map_size(new_dll.nodes) == 1
+    end
+  end
+
+  describe "remove_after/2" do
+    test "does nothing if the node is tail" do
+      {dll, tail_node} = %DLL{} |> DLL.insert_tail("test")
+      new_dll = DLL.remove_after(dll, tail_node)
+
+      assert dll == new_dll
+    end
+
+    test "removes the node after" do
+      {dll, head_node} = %DLL{} |> DLL.insert_tail("test")
+      {dll, _middle_node} = DLL.insert_tail(dll, "test2")
+      {dll, tail_node} = DLL.insert_tail(dll, "test3")
+
+      new_dll = DLL.remove_after(dll, head_node)
+
+      assert new_dll.head == head_node.__id__
+      assert new_dll.tail == tail_node.__id__
+      assert Map.get(new_dll.nodes, head_node.__id__) |> Map.get(:next) == tail_node.__id__
+      assert map_size(new_dll.nodes) == 2
+    end
+
+    test "removes the node and becomes tail" do
+      {dll, head_node} = %DLL{} |> DLL.insert_tail("test")
+      {dll, _tail_node} = DLL.insert_tail(dll, "test2")
+      new_dll = DLL.remove_after(dll, head_node)
+
+      assert new_dll.head == head_node.__id__
+      assert new_dll.tail == head_node.__id__
       assert map_size(new_dll.nodes) == 1
     end
   end
