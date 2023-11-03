@@ -7,7 +7,7 @@ defmodule DoublyLinkedList do
 
   def insert_head(%__MODULE__{head: head, tail: tail, nodes: nodes} = dll, data) do
     node = Node.new(data, next: head)
-    nodes = nodes |> Map.put(node.__id__, node) |> update_head_pointer(head, node.__id__)
+    nodes = nodes |> upsert_node(node) |> update_head_pointer(head, node.__id__)
 
     {%{dll | nodes: nodes, head: node.__id__, tail: tail || node.__id__}, node}
   end
@@ -16,7 +16,7 @@ defmodule DoublyLinkedList do
 
   def insert_tail(%__MODULE__{head: head, tail: tail, nodes: nodes} = dll, data) do
     node = Node.new(data, prev: tail)
-    nodes = nodes |> Map.put(node.__id__, node) |> update_tails(tail, node.__id__)
+    nodes = nodes |> upsert_node(node) |> update_tails(tail, node.__id__)
 
     {%{dll | nodes: nodes, head: head || node.__id__, tail: node.__id__}, node}
   end
@@ -30,7 +30,7 @@ defmodule DoublyLinkedList do
   end
 
   def insert_before(%__MODULE__{} = dll, %Node{} = before_node, data) do
-    case Map.get(dll.nodes, before_node.prev) do
+    case get_prev_node(dll.nodes, before_node) do
       nil -> insert_head(dll, data)
       after_node -> update_inbetween(dll, after_node, before_node, data)
     end
@@ -43,7 +43,7 @@ defmodule DoublyLinkedList do
   end
 
   def insert_after(%__MODULE__{} = dll, %Node{} = after_node, data) do
-    case Map.get(dll.nodes, after_node.next) do
+    case get_next_node(dll.nodes, after_node) do
       nil -> insert_tail(dll, data)
       before_node -> update_inbetween(dll, after_node, before_node, data)
     end
@@ -55,12 +55,8 @@ defmodule DoublyLinkedList do
         new()
 
       old_head ->
-        new_head = Map.get(dll.nodes, old_head.next)
-
-        nodes =
-          dll.nodes
-          |> Map.delete(dll.head)
-          |> Map.put(new_head.__id__, %{new_head | prev: nil})
+        new_head = get_next_node(dll.nodes, old_head)
+        nodes = dll.nodes |> delete_node(dll.head) |> upsert_node(%{new_head | prev: nil})
 
         %{dll | nodes: nodes, head: new_head.__id__}
     end
@@ -74,12 +70,8 @@ defmodule DoublyLinkedList do
         new()
 
       old_tail ->
-        new_tail = Map.get(dll.nodes, old_tail.prev)
-
-        nodes =
-          dll.nodes
-          |> Map.delete(dll.tail)
-          |> Map.put(new_tail.__id__, %{new_tail | next: nil})
+        new_tail = get_prev_node(dll.nodes, old_tail)
+        nodes = dll.nodes |> delete_node(dll.tail) |> upsert_node(%{new_tail | next: nil})
 
         %{dll | nodes: nodes, tail: new_tail.__id__}
     end
@@ -88,14 +80,14 @@ defmodule DoublyLinkedList do
   def remove_tail({%__MODULE__{} = dll, _node}), do: remove_tail(dll)
 
   def remove_before(%__MODULE__{} = dll, before_node_id) when is_binary(before_node_id) do
-    with %{prev: prev} = before_node when prev != nil <- Map.get(dll.nodes, before_node_id),
-         %{prev: prev} = old_prev_node when prev != nil <- Map.get(dll.nodes, before_node.prev),
-         new_prev_node <- Map.get(dll.nodes, old_prev_node.prev) do
+    with %{prev: prev} = before_node when prev != nil <- get_node(dll.nodes, before_node_id),
+         %{prev: prev} = old_prev_node when prev != nil <- get_prev_node(dll.nodes, before_node),
+         new_prev_node <- get_prev_node(dll.nodes, old_prev_node) do
       nodes =
         dll.nodes
-        |> Map.delete(old_prev_node.__id__)
-        |> Map.put(new_prev_node.__id__, %{new_prev_node | next: before_node_id})
-        |> Map.put(before_node_id, %{before_node | prev: new_prev_node.__id__})
+        |> delete_node(old_prev_node)
+        |> upsert_node(%{new_prev_node | next: before_node_id})
+        |> upsert_node(%{before_node | prev: new_prev_node.__id__})
 
       %{dll | nodes: nodes}
     else
@@ -110,14 +102,14 @@ defmodule DoublyLinkedList do
   end
 
   def remove_after(%__MODULE__{} = dll, after_node_id) when is_binary(after_node_id) do
-    with %{next: next} = after_node when next != nil <- Map.get(dll.nodes, after_node_id),
-         %{next: next} = old_next_node when next != nil <- Map.get(dll.nodes, after_node.next),
-         new_next_node <- Map.get(dll.nodes, old_next_node.next) do
+    with %{next: next} = after_node when next != nil <- get_node(dll.nodes, after_node_id),
+         %{next: next} = old_next_node when next != nil <- get_next_node(dll.nodes, after_node),
+         new_next_node <- get_next_node(dll.nodes, old_next_node) do
       nodes =
         dll.nodes
-        |> Map.delete(old_next_node.__id__)
-        |> Map.put(new_next_node.__id__, %{new_next_node | prev: after_node_id})
-        |> Map.put(after_node_id, %{after_node | next: new_next_node.__id__})
+        |> delete_node(old_next_node)
+        |> upsert_node(%{new_next_node | prev: after_node_id})
+        |> upsert_node(%{after_node | next: new_next_node.__id__})
 
       %{dll | nodes: nodes}
     else
@@ -131,13 +123,8 @@ defmodule DoublyLinkedList do
     remove_after(dll, after_node.__id__)
   end
 
-  def get(%__MODULE__{} = dll, node_id) when is_binary(node_id) do
-    Map.get(dll.nodes, node_id)
-  end
-
-  def get(%__MODULE__{} = dll, %Node{} = node) do
-    get(dll, node.__id__)
-  end
+  def get(%__MODULE__{} = dll, node_id) when is_binary(node_id), do: get_node(dll.nodes, node_id)
+  def get(%__MODULE__{} = dll, %Node{} = node), do: get_node(dll.nodes, node)
 
   def update(%__MODULE__{} = dll, node_id, data) when is_binary(node_id) do
     nodes = Map.update!(dll.nodes, node_id, fn node -> %{node | data: data} end)
@@ -148,20 +135,38 @@ defmodule DoublyLinkedList do
     update(dll, node.__id__, data)
   end
 
-  # TODO
-  # - remove before
-  # - remove after
-  # - update
-  # - get a fresh copy of the node before using its attributes
+  defp get_node(nodes, node_id) when is_binary(node_id), do: Map.get(nodes, node_id)
+  defp get_node(nodes, %Node{__id__: id}), do: Map.get(nodes, id)
+
+  defp get_prev_node(nodes, node_id) when is_binary(node_id) do
+    node = get_node(nodes, node_id)
+    get_prev_node(nodes, node)
+  end
+
+  defp get_prev_node(_nodes, %Node{prev: nil}), do: nil
+  defp get_prev_node(nodes, %Node{prev: prev_id}), do: get_node(nodes, prev_id)
+
+  defp get_next_node(nodes, node_id) when is_binary(node_id) do
+    node = get_node(nodes, node_id)
+    get_next_node(nodes, node)
+  end
+
+  defp get_next_node(_nodes, %Node{next: nil}), do: nil
+  defp get_next_node(nodes, %Node{next: next_id}), do: get_node(nodes, next_id)
+
+  defp upsert_node(nodes, %Node{__id__: id} = node), do: Map.put(nodes, id, node)
+
+  defp delete_node(nodes, node_id) when is_binary(node_id), do: Map.delete(nodes, node_id)
+  defp delete_node(nodes, %Node{__id__: id}), do: Map.delete(nodes, id)
 
   defp update_inbetween(%__MODULE__{} = dll, %Node{} = after_node, %Node{} = before_node, data) do
     node = Node.new(data, prev: after_node.__id__, next: before_node.__id__)
 
     nodes =
       dll.nodes
-      |> Map.put(after_node.__id__, %{after_node | next: node.__id__})
-      |> Map.put(node.__id__, node)
-      |> Map.put(before_node.__id__, %{before_node | prev: node.__id__})
+      |> upsert_node(%{after_node | next: node.__id__})
+      |> upsert_node(node)
+      |> upsert_node(%{before_node | prev: node.__id__})
 
     {%{dll | nodes: nodes}, node}
   end
