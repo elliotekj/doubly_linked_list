@@ -24,9 +24,10 @@ defmodule DoublyLinkedList do
   def insert_tail({%__MODULE__{} = dll, _node}, data), do: insert_tail(dll, data)
 
   def insert_before(%__MODULE__{} = dll, before_node_id, data) when is_binary(before_node_id) do
-    # TODO Handle raise
-    before_node = Map.fetch!(dll.nodes, before_node_id)
-    insert_before(dll, before_node, data)
+    case get_node(dll.nodes, before_node_id) do
+      nil -> {dll, nil}
+      before_node -> insert_before(dll, before_node, data)
+    end
   end
 
   def insert_before(%__MODULE__{} = dll, %Node{} = before_node, data) do
@@ -37,9 +38,10 @@ defmodule DoublyLinkedList do
   end
 
   def insert_after(%__MODULE__{} = dll, after_node_id, data) when is_binary(after_node_id) do
-    # TODO Handle raise
-    after_node = Map.fetch!(dll.nodes, after_node_id)
-    insert_after(dll, after_node, data)
+    case get_node(dll.nodes, after_node_id) do
+      nil -> {dll, nil}
+      after_node -> insert_after(dll, after_node, data)
+    end
   end
 
   def insert_after(%__MODULE__{} = dll, %Node{} = after_node, data) do

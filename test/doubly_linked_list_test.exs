@@ -93,6 +93,14 @@ defmodule DoublyLinkedListTest do
       assert node.next == tail_node.__id__
       assert map_size(dll.nodes) == 3
     end
+
+    test "returns nil if the insertion failed" do
+      {dll, _tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
+      {dll, node} = DLL.insert_before(dll, "unknown_id", "test3")
+
+      assert node |> is_nil()
+      assert map_size(dll.nodes) == 2
+    end
   end
 
   describe "insert_after/2" do
@@ -120,6 +128,14 @@ defmodule DoublyLinkedListTest do
       assert node.prev == head_node.__id__
       assert node.next == tail_node.__id__
       assert map_size(dll.nodes) == 3
+    end
+
+    test "returns nil if the insertion failed" do
+      {dll, _tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
+      {dll, node} = DLL.insert_after(dll, "unknown_id", "test3")
+
+      assert node |> is_nil()
+      assert map_size(dll.nodes) == 2
     end
   end
 
