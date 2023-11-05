@@ -16,7 +16,7 @@ defmodule DoublyLinkedList do
 
   def insert_tail(%__MODULE__{head: head, tail: tail, nodes: nodes} = dll, data) do
     node = Node.new(data, prev: tail)
-    nodes = nodes |> upsert_node(node) |> update_tails(tail, node.__id__)
+    nodes = nodes |> upsert_node(node) |> update_tail_pointer(tail, node.__id__)
 
     {%{dll | nodes: nodes, head: head || node.__id__, tail: node.__id__}, node}
   end
@@ -179,9 +179,9 @@ defmodule DoublyLinkedList do
     Map.update!(nodes, current_head, fn node -> %{node | prev: new_head} end)
   end
 
-  defp update_tails(nodes, nil, _new_tail), do: nodes
+  defp update_tail_pointer(nodes, nil, _new_tail), do: nodes
 
-  defp update_tails(nodes, current_tail, new_tail) do
+  defp update_tail_pointer(nodes, current_tail, new_tail) do
     Map.update!(nodes, current_tail, fn node -> %{node | next: new_tail} end)
   end
 end
