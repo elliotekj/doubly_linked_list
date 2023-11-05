@@ -24,31 +24,33 @@ defmodule DoublyLinkedList do
   def insert_tail({%__MODULE__{} = dll, _node}, data), do: insert_tail(dll, data)
 
   def insert_before(%__MODULE__{} = dll, before_node_id, data) when is_binary(before_node_id) do
-    case get_node(dll.nodes, before_node_id) do
+    with before_node when not is_nil(before_node) <- get_node(dll.nodes, before_node_id),
+         %{prev: prev} when not is_nil(prev) <- before_node,
+         after_node <- get_prev_node(dll.nodes, before_node) do
+      update_inbetween(dll, after_node, before_node, data)
+    else
       nil -> {dll, nil}
-      before_node -> insert_before(dll, before_node, data)
+      %{prev: nil} -> insert_head(dll, data)
     end
   end
 
   def insert_before(%__MODULE__{} = dll, %Node{} = before_node, data) do
-    case get_prev_node(dll.nodes, before_node) do
-      nil -> insert_head(dll, data)
-      after_node -> update_inbetween(dll, after_node, before_node, data)
-    end
+    insert_before(dll, before_node.__id__, data)
   end
 
   def insert_after(%__MODULE__{} = dll, after_node_id, data) when is_binary(after_node_id) do
-    case get_node(dll.nodes, after_node_id) do
+    with after_node when not is_nil(after_node) <- get_node(dll.nodes, after_node_id),
+         %{next: next} when not is_nil(next) <- after_node,
+         before_node <- get_next_node(dll.nodes, after_node) do
+      update_inbetween(dll, after_node, before_node, data)
+    else
       nil -> {dll, nil}
-      after_node -> insert_after(dll, after_node, data)
+      %{prev: nil} -> insert_tail(dll, data)
     end
   end
 
   def insert_after(%__MODULE__{} = dll, %Node{} = after_node, data) do
-    case get_next_node(dll.nodes, after_node) do
-      nil -> insert_tail(dll, data)
-      before_node -> update_inbetween(dll, after_node, before_node, data)
-    end
+    insert_after(dll, after_node.__id__, data)
   end
 
   def remove_head(%__MODULE__{} = dll) do
