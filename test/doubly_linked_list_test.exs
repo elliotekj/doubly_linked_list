@@ -73,11 +73,11 @@ defmodule DoublyLinkedListTest do
       {dll, node} = DLL.insert_before(dll, tail_node, "test2")
 
       head_node = Map.get(dll.nodes, dll.head)
-      node = Map.get(dll.nodes, node.__id__)
+      node = Map.get(dll.nodes, node.id)
       tail_node = Map.get(dll.nodes, dll.tail)
 
       assert head_node == node
-      assert node.next == tail_node.__id__
+      assert node.next == tail_node.id
       assert map_size(dll.nodes) == 2
     end
 
@@ -86,11 +86,11 @@ defmodule DoublyLinkedListTest do
       {dll, node} = DLL.insert_before(dll, tail_node, "test3")
 
       head_node = Map.get(dll.nodes, dll.head)
-      node = Map.get(dll.nodes, node.__id__)
+      node = Map.get(dll.nodes, node.id)
       tail_node = Map.get(dll.nodes, dll.tail)
 
-      assert node.prev == head_node.__id__
-      assert node.next == tail_node.__id__
+      assert node.prev == head_node.id
+      assert node.next == tail_node.id
       assert map_size(dll.nodes) == 3
     end
 
@@ -109,11 +109,11 @@ defmodule DoublyLinkedListTest do
       {dll, node} = DLL.insert_after(dll, tail_node, "test2")
 
       head_node = Map.get(dll.nodes, dll.head)
-      node = Map.get(dll.nodes, node.__id__)
+      node = Map.get(dll.nodes, node.id)
       tail_node = Map.get(dll.nodes, dll.tail)
 
       assert tail_node == node
-      assert node.prev == head_node.__id__
+      assert node.prev == head_node.id
       assert map_size(dll.nodes) == 2
     end
 
@@ -122,11 +122,11 @@ defmodule DoublyLinkedListTest do
       {dll, node} = DLL.insert_after(dll, tail_node, "test3")
 
       head_node = Map.get(dll.nodes, dll.head)
-      node = Map.get(dll.nodes, node.__id__)
+      node = Map.get(dll.nodes, node.id)
       tail_node = Map.get(dll.nodes, dll.tail)
 
-      assert node.prev == head_node.__id__
-      assert node.next == tail_node.__id__
+      assert node.prev == head_node.id
+      assert node.next == tail_node.id
       assert map_size(dll.nodes) == 3
     end
 
@@ -144,8 +144,8 @@ defmodule DoublyLinkedListTest do
       {dll, tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
       new_dll = DLL.remove_head(dll)
 
-      assert new_dll.head == tail_node.__id__
-      assert new_dll.tail == tail_node.__id__
+      assert new_dll.head == tail_node.id
+      assert new_dll.tail == tail_node.id
       assert map_size(new_dll.nodes) == 1
     end
 
@@ -164,8 +164,8 @@ defmodule DoublyLinkedListTest do
       {dll, head_node} = %DLL{} |> DLL.insert_head("test") |> DLL.insert_head("test2")
       new_dll = DLL.remove_tail(dll)
 
-      assert new_dll.head == head_node.__id__
-      assert new_dll.tail == head_node.__id__
+      assert new_dll.head == head_node.id
+      assert new_dll.tail == head_node.id
       assert map_size(new_dll.nodes) == 1
     end
 
@@ -194,9 +194,9 @@ defmodule DoublyLinkedListTest do
 
       new_dll = DLL.remove_before(dll, tail_node)
 
-      assert new_dll.head == head_node.__id__
-      assert new_dll.tail == tail_node.__id__
-      assert Map.get(new_dll.nodes, tail_node.__id__) |> Map.get(:prev) == head_node.__id__
+      assert new_dll.head == head_node.id
+      assert new_dll.tail == tail_node.id
+      assert Map.get(new_dll.nodes, tail_node.id) |> Map.get(:prev) == head_node.id
       assert map_size(new_dll.nodes) == 2
     end
 
@@ -205,8 +205,8 @@ defmodule DoublyLinkedListTest do
       {dll, tail_node} = DLL.insert_tail(dll, "test2")
       new_dll = DLL.remove_before(dll, tail_node)
 
-      assert new_dll.head == tail_node.__id__
-      assert new_dll.tail == tail_node.__id__
+      assert new_dll.head == tail_node.id
+      assert new_dll.tail == tail_node.id
       assert map_size(new_dll.nodes) == 1
     end
   end
@@ -226,9 +226,9 @@ defmodule DoublyLinkedListTest do
 
       new_dll = DLL.remove_after(dll, head_node)
 
-      assert new_dll.head == head_node.__id__
-      assert new_dll.tail == tail_node.__id__
-      assert Map.get(new_dll.nodes, head_node.__id__) |> Map.get(:next) == tail_node.__id__
+      assert new_dll.head == head_node.id
+      assert new_dll.tail == tail_node.id
+      assert Map.get(new_dll.nodes, head_node.id) |> Map.get(:next) == tail_node.id
       assert map_size(new_dll.nodes) == 2
     end
 
@@ -237,8 +237,8 @@ defmodule DoublyLinkedListTest do
       {dll, _tail_node} = DLL.insert_tail(dll, "test2")
       new_dll = DLL.remove_after(dll, head_node)
 
-      assert new_dll.head == head_node.__id__
-      assert new_dll.tail == head_node.__id__
+      assert new_dll.head == head_node.id
+      assert new_dll.tail == head_node.id
       assert map_size(new_dll.nodes) == 1
     end
   end
