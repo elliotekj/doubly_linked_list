@@ -54,7 +54,7 @@ defmodule DoublyLinkedList do
   end
 
   def remove_head(%__MODULE__{} = dll) do
-    case Map.get(dll.nodes, dll.head) do
+    case get_node(dll.nodes, dll.head) do
       %{next: nil} ->
         new()
 
@@ -69,7 +69,7 @@ defmodule DoublyLinkedList do
   def remove_head({%__MODULE__{} = dll, _node}), do: remove_head(dll)
 
   def remove_tail(%__MODULE__{} = dll) do
-    case Map.get(dll.nodes, dll.tail) do
+    case get_node(dll.nodes, dll.tail) do
       %{prev: nil} ->
         new()
 
