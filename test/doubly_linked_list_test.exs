@@ -264,5 +264,10 @@ defmodule DoublyLinkedListTest do
 
       assert DLL.get(dll, tail_node) |> Map.get(:data) == "test2"
     end
+
+    test "returns nil if the node doesn't exist" do
+      {dll, _tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
+      assert nil == DLL.update(dll, "unknown_id", "test3")
+    end
   end
 end

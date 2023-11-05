@@ -129,8 +129,14 @@ defmodule DoublyLinkedList do
   def get(%__MODULE__{} = dll, %Node{} = node), do: get_node(dll.nodes, node)
 
   def update(%__MODULE__{} = dll, node_id, data) when is_binary(node_id) do
-    nodes = Map.update!(dll.nodes, node_id, fn node -> %{node | data: data} end)
-    %{dll | nodes: nodes}
+    case get_node(dll.nodes, node_id) do
+      nil ->
+        nil
+
+      node ->
+        nodes = dll.nodes |> upsert_node(%{node | data: data})
+        %{dll | nodes: nodes}
+    end
   end
 
   def update(%__MODULE__{} = dll, %Node{} = node, data) do
