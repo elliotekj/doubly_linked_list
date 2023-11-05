@@ -96,7 +96,6 @@ defmodule DoublyLinkedList do
       %{dll | nodes: nodes}
     else
       %{__id__: id, prev: nil} when id == before_node_id -> dll
-      # FIXME Double access for removing head
       %{prev: nil, next: next} when next == before_node_id -> remove_head(dll)
     end
   end
@@ -118,7 +117,6 @@ defmodule DoublyLinkedList do
       %{dll | nodes: nodes}
     else
       %{__id__: id, next: nil} when id == after_node_id -> dll
-      # FIXME Double access for removing head
       %{prev: prev, next: nil} when prev == after_node_id -> remove_tail(dll)
     end
   end

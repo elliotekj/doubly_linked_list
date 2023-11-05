@@ -250,6 +250,11 @@ defmodule DoublyLinkedListTest do
 
       assert tail_node == node
     end
+
+    test "returns nil if the node doesn't exist" do
+      {dll, _tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
+      assert nil == DLL.get(dll, "unknown_id")
+    end
   end
 
   describe "update/3" do
