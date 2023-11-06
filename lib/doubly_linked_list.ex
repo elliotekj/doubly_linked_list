@@ -128,6 +128,11 @@ defmodule DoublyLinkedList do
   def get(%__MODULE__{} = dll, node_id) when is_binary(node_id), do: get_node(dll.nodes, node_id)
   def get(%__MODULE__{} = dll, %Node{} = node), do: get_node(dll.nodes, node)
 
+  def find_from_head(%__MODULE__{} = dll, data) do
+    head = get_node(dll.nodes, dll.head)
+    return_node_or_step_forwards(dll, head, data)
+  end
+
   def update(%__MODULE__{} = dll, node_id, data) when is_binary(node_id) do
     case get_node(dll.nodes, node_id) do
       nil ->
@@ -189,5 +194,19 @@ defmodule DoublyLinkedList do
 
   defp update_tail_pointer(nodes, current_tail, new_tail) do
     Map.update!(nodes, current_tail, fn node -> %{node | next: new_tail} end)
+  end
+
+  defp return_node_or_step_forwards(%__MODULE__{} = dll, %Node{} = node, data) do
+    cond do
+      node.data == data ->
+        node
+
+      node.next == nil ->
+        nil
+
+      true ->
+        next_node = get_next_node(dll.nodes, node)
+        return_node_or_step_forwards(dll, next_node, data)
+    end
   end
 end
