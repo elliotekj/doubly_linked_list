@@ -125,6 +125,27 @@ defmodule DoublyLinkedList do
     remove_after(dll, after_node.id)
   end
 
+  def remove(%__MODULE__{} = dll, node_id) when is_binary(node_id) do
+    with %{prev: prev, next: next} = node when prev != nil and next != nil <-
+           get_node(dll.nodes, node_id),
+         prev_node <- get_prev_node(dll.nodes, node),
+         next_node <- get_next_node(dll.nodes, node) do
+      nodes =
+        dll.nodes
+        |> delete_node(node)
+        |> upsert_node(%{prev_node | next: next_node.id})
+        |> upsert_node(%{next_node | prev: prev_node.id})
+
+      %{dll | nodes: nodes}
+    else
+      nil -> dll
+      %{prev: nil} -> remove_head(dll)
+      %{next: nil} -> remove_tail(dll)
+    end
+  end
+
+  def remove(%__MODULE__{} = dll, %Node{id: id}), do: remove(dll, id)
+
   def get(%__MODULE__{} = dll, node_id) when is_binary(node_id), do: get_node(dll.nodes, node_id)
   def get(%__MODULE__{} = dll, %Node{} = node), do: get_node(dll.nodes, node)
 

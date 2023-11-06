@@ -243,6 +243,60 @@ defmodule DoublyLinkedListTest do
     end
   end
 
+  describe "remove/2" do
+    test "removes the node" do
+      {dll, head_node} = %DLL{} |> DLL.insert_tail("test")
+      {dll, middle_node} = DLL.insert_tail(dll, "test2")
+      {dll, tail_node} = DLL.insert_tail(dll, "test3")
+
+      new_dll = DLL.remove(dll, middle_node)
+      head_node = DLL.get(new_dll, head_node)
+      tail_node = DLL.get(new_dll, tail_node)
+
+      assert new_dll.head == dll.head
+      assert new_dll.tail == dll.tail
+      assert head_node.next == tail_node.id
+      assert tail_node.prev == head_node.id
+      assert map_size(new_dll.nodes) == 2
+    end
+
+    test "removes the tail node" do
+      {dll, tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
+
+      new_dll = DLL.remove(dll, tail_node)
+
+      assert new_dll.head == dll.head
+      assert new_dll.tail == dll.head
+      assert map_size(new_dll.nodes) == 1
+    end
+
+    test "removes the head node" do
+      {dll, head_node} = %DLL{} |> DLL.insert_head("test") |> DLL.insert_head("test2")
+
+      new_dll = DLL.remove(dll, head_node)
+
+      assert new_dll.head == dll.tail
+      assert new_dll.tail == dll.tail
+      assert map_size(new_dll.nodes) == 1
+    end
+
+    test "removes the node when scaling to 0" do
+      {dll, tail_node} = %DLL{} |> DLL.insert_tail("test")
+      new_dll = DLL.remove(dll, tail_node)
+
+      assert new_dll.head |> is_nil()
+      assert new_dll.tail |> is_nil()
+      assert map_size(new_dll.nodes) == 0
+    end
+
+    test "returns the old dll if the node doesn't exist" do
+      {dll, _tail_node} = %DLL{} |> DLL.insert_tail("test")
+      new_dll = DLL.remove(dll, "unknown_id")
+
+      assert dll == new_dll
+    end
+  end
+
   describe "get/2" do
     test "returns the node" do
       {dll, tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
