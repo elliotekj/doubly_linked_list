@@ -279,5 +279,15 @@ defmodule DoublyLinkedListTest do
       refute is_nil(DLL.find_from_head(dll, "test86"))
       assert is_nil(DLL.find_from_head(dll, "test101"))
     end
+
+  describe "find_from_tail/2" do
+    test "returns the node or nil" do
+      {dll, _tail_node} =
+        Enum.reduce(1..100, %DLL{}, fn i, acc -> DLL.insert_tail(acc, "test#{i}") end)
+
+      refute is_nil(DLL.find_from_tail(dll, "test86"))
+      assert is_nil(DLL.find_from_tail(dll, "test101"))
+    end
+  end
   end
 end

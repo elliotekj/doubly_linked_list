@@ -133,6 +133,11 @@ defmodule DoublyLinkedList do
     return_node_or_step_forwards(dll, head, data)
   end
 
+  def find_from_tail(%__MODULE__{} = dll, data) do
+    tail = get_node(dll.nodes, dll.tail)
+    return_node_or_step_backwards(dll, tail, data)
+  end
+
   def update(%__MODULE__{} = dll, node_id, data) when is_binary(node_id) do
     case get_node(dll.nodes, node_id) do
       nil ->
@@ -207,6 +212,20 @@ defmodule DoublyLinkedList do
       true ->
         next_node = get_next_node(dll.nodes, node)
         return_node_or_step_forwards(dll, next_node, data)
+    end
+  end
+
+  defp return_node_or_step_backwards(%__MODULE__{} = dll, %Node{} = node, data) do
+    cond do
+      node.data == data ->
+        node
+
+      node.prev == nil ->
+        nil
+
+      true ->
+        prev_node = get_prev_node(dll.nodes, node)
+        return_node_or_step_backwards(dll, prev_node, data)
     end
   end
 end
