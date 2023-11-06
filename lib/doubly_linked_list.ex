@@ -95,6 +95,7 @@ defmodule DoublyLinkedList do
 
       %{dll | nodes: nodes}
     else
+      nil -> dll
       %{id: id, prev: nil} when id == before_node_id -> dll
       %{prev: nil, next: next} when next == before_node_id -> remove_head(dll)
     end
@@ -116,6 +117,7 @@ defmodule DoublyLinkedList do
 
       %{dll | nodes: nodes}
     else
+      nil -> dll
       %{id: id, next: nil} when id == after_node_id -> dll
       %{prev: prev, next: nil} when prev == after_node_id -> remove_tail(dll)
     end

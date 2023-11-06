@@ -209,6 +209,13 @@ defmodule DoublyLinkedListTest do
       assert new_dll.tail == tail_node.id
       assert map_size(new_dll.nodes) == 1
     end
+
+    test "returns the old dll if the node doesn't exist" do
+      {dll, _tail_node} = %DLL{} |> DLL.insert_tail("test")
+      new_dll = DLL.remove_before(dll, "unknown_id")
+
+      assert dll == new_dll
+    end
   end
 
   describe "remove_after/2" do
@@ -240,6 +247,13 @@ defmodule DoublyLinkedListTest do
       assert new_dll.head == head_node.id
       assert new_dll.tail == head_node.id
       assert map_size(new_dll.nodes) == 1
+    end
+
+    test "returns the old dll if the node doesn't exist" do
+      {dll, _tail_node} = %DLL{} |> DLL.insert_tail("test")
+      new_dll = DLL.remove_after(dll, "unknown_id")
+
+      assert dll == new_dll
     end
   end
 
