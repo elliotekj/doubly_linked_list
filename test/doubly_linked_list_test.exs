@@ -257,6 +257,60 @@ defmodule DoublyLinkedListTest do
     end
   end
 
+  describe "get_head/1" do
+    test "returns the head node" do
+      {dll, head_node} = %DLL{} |> DLL.insert_head("test") |> DLL.insert_head("test2")
+      node = DLL.get_head(dll)
+
+      assert head_node == node
+    end
+
+    test "returns nil if the list is empty" do
+      assert nil == DLL.get_head(DLL.new())
+    end
+  end
+
+  describe "get_tail/1" do
+    test "returns the tail node" do
+      {dll, tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
+      node = DLL.get_tail(dll)
+
+      assert tail_node == node
+    end
+
+    test "returns nil if the list is empty" do
+      assert nil == DLL.get_tail(DLL.new())
+    end
+  end
+
+  describe "get_next/2" do
+    test "returns the next node" do
+      {dll, tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
+      node = DLL.get_next(dll, dll.head)
+
+      assert tail_node == node
+    end
+
+    test "returns nil if the node doesn't exist" do
+      {dll, tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test2")
+      assert nil == DLL.get_next(dll, tail_node)
+    end
+  end
+
+  describe "get_prev/2" do
+    test "returns the previous node" do
+      {dll, head_node} = %DLL{} |> DLL.insert_head("test") |> DLL.insert_head("test2")
+      node = DLL.get_prev(dll, dll.tail)
+
+      assert head_node == node
+    end
+
+    test "returns nil if the node doesn't exist" do
+      {dll, head_node} = %DLL{} |> DLL.insert_head("test") |> DLL.insert_head("test2")
+      assert nil == DLL.get_prev(dll, head_node)
+    end
+  end
+
   describe "update/3" do
     test "updated the data" do
       {dll, tail_node} = %DLL{} |> DLL.insert_tail("test") |> DLL.insert_tail("test3")
