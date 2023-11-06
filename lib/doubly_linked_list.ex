@@ -79,8 +79,12 @@ defmodule DoublyLinkedList do
           nodes: %{optional(String.t()) => Node.t()}
         }
 
+  @doc "Construct a new list."
+  @spec new :: t()
   def new, do: %__MODULE__{}
 
+  @doc "Insert a node at the head of the list."
+  @spec insert_head(t(), term()) :: {t(), Node.t()}
   def insert_head(%__MODULE__{head: head, tail: tail, nodes: nodes} = dll, data) do
     node = Node.new(data, next: head)
     nodes = nodes |> upsert_node(node) |> update_head_pointer(head, node.id)
@@ -88,8 +92,11 @@ defmodule DoublyLinkedList do
     {%{dll | nodes: nodes, head: node.id, tail: tail || node.id}, node}
   end
 
+  @spec insert_head({t(), Node.t()}, term()) :: {t(), Node.t()}
   def insert_head({%__MODULE__{} = dll, _node}, data), do: insert_head(dll, data)
 
+  @doc "Insert a node at the tail of the list."
+  @spec insert_tail(t(), term()) :: {t(), Node.t()}
   def insert_tail(%__MODULE__{head: head, tail: tail, nodes: nodes} = dll, data) do
     node = Node.new(data, prev: tail)
     nodes = nodes |> upsert_node(node) |> update_tail_pointer(tail, node.id)
@@ -97,8 +104,11 @@ defmodule DoublyLinkedList do
     {%{dll | nodes: nodes, head: head || node.id, tail: node.id}, node}
   end
 
+  @spec insert_tail({t(), Node.t()}, term()) :: {t(), Node.t()}
   def insert_tail({%__MODULE__{} = dll, _node}, data), do: insert_tail(dll, data)
 
+  @doc "Insert a node before the given node."
+  @spec insert_before(t(), String.t(), term()) :: {t(), Node.t() | nil}
   def insert_before(%__MODULE__{} = dll, before_node_id, data) when is_binary(before_node_id) do
     with before_node when not is_nil(before_node) <- get_node(dll.nodes, before_node_id),
          %{prev: prev} when not is_nil(prev) <- before_node,
@@ -110,10 +120,13 @@ defmodule DoublyLinkedList do
     end
   end
 
+  @spec insert_before(t(), Node.t(), term()) :: {t(), Node.t() | nil}
   def insert_before(%__MODULE__{} = dll, %Node{} = before_node, data) do
     insert_before(dll, before_node.id, data)
   end
 
+  @doc "Insert a node after the given node."
+  @spec insert_after(t(), String.t(), term()) :: {t(), Node.t() | nil}
   def insert_after(%__MODULE__{} = dll, after_node_id, data) when is_binary(after_node_id) do
     with after_node when not is_nil(after_node) <- get_node(dll.nodes, after_node_id),
          %{next: next} when not is_nil(next) <- after_node,
@@ -125,10 +138,13 @@ defmodule DoublyLinkedList do
     end
   end
 
+  @spec insert_after(t(), Node.t(), term()) :: {t(), Node.t() | nil}
   def insert_after(%__MODULE__{} = dll, %Node{} = after_node, data) do
     insert_after(dll, after_node.id, data)
   end
 
+  @doc "Remove the node at the head of the list."
+  @spec remove_head(t()) :: t()
   def remove_head(%__MODULE__{} = dll) do
     case get_node(dll.nodes, dll.head) do
       %{next: nil} ->
@@ -142,8 +158,8 @@ defmodule DoublyLinkedList do
     end
   end
 
-  def remove_head({%__MODULE__{} = dll, _node}), do: remove_head(dll)
-
+  @doc "Remove the node at the tail of the list."
+  @spec remove_tail(t()) :: t()
   def remove_tail(%__MODULE__{} = dll) do
     case get_node(dll.nodes, dll.tail) do
       %{prev: nil} ->
@@ -157,8 +173,8 @@ defmodule DoublyLinkedList do
     end
   end
 
-  def remove_tail({%__MODULE__{} = dll, _node}), do: remove_tail(dll)
-
+  @doc "Remove the node before the given node."
+  @spec remove_before(t(), String.t()) :: t()
   def remove_before(%__MODULE__{} = dll, before_node_id) when is_binary(before_node_id) do
     with %{prev: prev} = before_node when prev != nil <- get_node(dll.nodes, before_node_id),
          %{prev: prev} = old_prev_node when prev != nil <- get_prev_node(dll.nodes, before_node),
@@ -177,10 +193,13 @@ defmodule DoublyLinkedList do
     end
   end
 
+  @spec remove_before(t(), Node.t()) :: t()
   def remove_before(%__MODULE__{} = dll, %Node{} = before_node) do
     remove_before(dll, before_node.id)
   end
 
+  @doc "Remove the node after the given node."
+  @spec remove_after(t(), String.t()) :: t()
   def remove_after(%__MODULE__{} = dll, after_node_id) when is_binary(after_node_id) do
     with %{next: next} = after_node when next != nil <- get_node(dll.nodes, after_node_id),
          %{next: next} = old_next_node when next != nil <- get_next_node(dll.nodes, after_node),
@@ -199,10 +218,13 @@ defmodule DoublyLinkedList do
     end
   end
 
+  @spec remove_after(t(), Node.t()) :: t()
   def remove_after(%__MODULE__{} = dll, %Node{} = after_node) do
     remove_after(dll, after_node.id)
   end
 
+  @doc "Remove the node."
+  @spec remove(t(), String.t()) :: t()
   def remove(%__MODULE__{} = dll, node_id) when is_binary(node_id) do
     with %{prev: prev, next: next} = node when prev != nil and next != nil <-
            get_node(dll.nodes, node_id),
@@ -222,27 +244,51 @@ defmodule DoublyLinkedList do
     end
   end
 
+  @spec remove(t(), Node.t()) :: t()
   def remove(%__MODULE__{} = dll, %Node{id: id}), do: remove(dll, id)
 
+  @doc "Get the node."
+  @spec get(t(), String.t()) :: Node.t() | nil
   def get(%__MODULE__{} = dll, node_id) when is_binary(node_id), do: get_node(dll.nodes, node_id)
+
+  @spec get(t(), Node.t()) :: Node.t() | nil
   def get(%__MODULE__{} = dll, %Node{} = node), do: get_node(dll.nodes, node)
 
+  @doc "Get the node at the head of the list."
+  @spec get_head(t()) :: nil
   def get_head(%__MODULE__{head: nil}), do: nil
+
+  @spec get_head(t()) :: Node.t()
   def get_head(%__MODULE__{} = dll), do: get_node(dll.nodes, dll.head)
 
+  @doc "Get the node at the tail of the list."
+  @spec get_tail(t()) :: nil
   def get_tail(%__MODULE__{tail: nil}), do: nil
+
+  @spec get_tail(t()) :: Node.t()
   def get_tail(%__MODULE__{} = dll), do: get_node(dll.nodes, dll.tail)
 
+  @doc "Get the node after the given node."
+  @spec get_next(t(), String.t()) :: Node.t() | nil
   def get_next(%__MODULE__{} = dll, node_id) when is_binary(node_id),
     do: get_next_node(dll.nodes, node_id)
 
+  @spec get_next(t(), Node.t()) :: Node.t() | nil
   def get_next(%__MODULE__{} = dll, %Node{id: id}), do: get_next_node(dll.nodes, id)
 
+  @doc "Get the node before the given node."
+  @spec get_prev(t(), String.t()) :: Node.t() | nil
   def get_prev(%__MODULE__{} = dll, node_id) when is_binary(node_id),
     do: get_prev_node(dll.nodes, node_id)
 
+  @spec get_prev(t(), Node.t()) :: Node.t() | nil
   def get_prev(%__MODULE__{} = dll, %Node{id: id}), do: get_prev_node(dll.nodes, id)
 
+  @doc """
+  Find the first node whose data matches the given value (starting from the head
+  of the list).
+  """
+  @spec find_from_head(t(), term()) :: Node.t() | nil
   def find_from_head(%__MODULE__{head: nil}, _data), do: nil
 
   def find_from_head(%__MODULE__{} = dll, data) do
@@ -252,6 +298,11 @@ defmodule DoublyLinkedList do
     end
   end
 
+  @doc """
+  Find the first node whose data matches the given value (starting from the tail
+  of the list).
+  """
+  @spec find_from_tail(t(), term()) :: Node.t() | nil
   def find_from_tail(%__MODULE__{tail: nil}, _data), do: nil
 
   def find_from_tail(%__MODULE__{} = dll, data) do
@@ -261,6 +312,8 @@ defmodule DoublyLinkedList do
     end
   end
 
+  @doc "Update the node with the given value."
+  @spec update(t(), String.t(), term()) :: t() | nil
   def update(%__MODULE__{} = dll, node_id, data) when is_binary(node_id) do
     case get_node(dll.nodes, node_id) do
       nil ->
@@ -272,6 +325,7 @@ defmodule DoublyLinkedList do
     end
   end
 
+  @spec update(t(), Node.t(), term()) :: t() | nil
   def update(%__MODULE__{} = dll, %Node{} = node, data) do
     update(dll, node.id, data)
   end

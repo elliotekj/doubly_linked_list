@@ -21,7 +21,8 @@ defmodule DoublyLinkedList.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:elixir_uuid, "~> 1.2"}
+      {:elixir_uuid, "~> 1.2"},
+      {:ex_doc, "~> 0.30.9"}
     ]
   end
 end
