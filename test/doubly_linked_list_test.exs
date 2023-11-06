@@ -300,5 +300,45 @@ defmodule DoublyLinkedListTest do
       assert is_nil(DLL.find_from_tail(dll, "test"))
     end
   end
+
+  describe "Enumerable" do
+    test "count/1" do
+      {dll, _tail_node} =
+        Enum.reduce(1..100, %DLL{}, fn i, acc -> DLL.insert_tail(acc, "test#{i}") end)
+
+      assert Enum.count(dll) == 100
+    end
+
+    test "member?/2" do
+      {dll, _tail_node} =
+        Enum.reduce(1..100, %DLL{}, fn i, acc -> DLL.insert_tail(acc, "test#{i}") end)
+
+      assert true == Enum.member?(dll, "test86")
+      assert false == Enum.member?(dll, "test101")
+    end
+
+    test "reduce/3" do
+      {dll, _tail_node} =
+        Enum.reduce(1..100, %DLL{}, fn i, acc -> DLL.insert_tail(acc, i) end)
+
+      list = Enum.reduce(dll, [], fn i, acc -> [i | acc] end)
+      assert Enum.to_list(100..1) == list
+
+      half_list =
+        Enum.reduce_while(dll, [], fn
+          51, acc -> {:halt, acc}
+          i, acc -> {:cont, [i | acc]}
+        end)
+
+      assert Enum.to_list(50..1) == half_list
+    end
+
+    test "slice/3" do
+      {dll, _tail_node} =
+        Enum.reduce(1..100, %DLL{}, fn i, acc -> DLL.insert_tail(acc, i) end)
+
+      subset = Enum.slice(dll, 0, 10)
+      assert Enum.to_list(1..10) == subset
+    end
   end
 end

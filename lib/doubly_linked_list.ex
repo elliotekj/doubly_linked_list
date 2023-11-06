@@ -161,6 +161,33 @@ defmodule DoublyLinkedList do
     update(dll, node.id, data)
   end
 
+  defimpl Enumerable, for: __MODULE__ do
+    def count(%DoublyLinkedList{nodes: nodes}), do: {:ok, Enum.count(nodes)}
+
+    def member?(%DoublyLinkedList{} = dll, data) do
+      case DoublyLinkedList.find_from_head(dll, data) do
+        nil -> {:ok, false}
+        _ -> {:ok, true}
+      end
+    end
+
+    def reduce(_dll, {:halt, acc}, _fun), do: {:halted, acc}
+
+    def reduce(%DoublyLinkedList{} = dll, {:suspend, acc}, fun),
+      do: {:suspended, acc, &reduce(dll, &1, fun)}
+
+    def reduce(%DoublyLinkedList{head: nil}, {:cont, acc}, _fun), do: {:done, acc}
+
+    def reduce(%DoublyLinkedList{head: head} = dll, {:cont, acc}, fun) do
+      head = DoublyLinkedList.get(dll, head)
+      dll = DoublyLinkedList.remove_head(dll)
+      reduce(dll, fun.(head.data, acc), fun)
+    end
+
+    # Defaults to the linear-time algorithm
+    def slice(_dll), do: {:error, __MODULE__}
+  end
+
   defp get_node(nodes, node_id) when is_binary(node_id), do: Map.get(nodes, node_id)
   defp get_node(nodes, %Node{id: id}), do: Map.get(nodes, id)
 
