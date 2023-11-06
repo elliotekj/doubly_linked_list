@@ -128,14 +128,22 @@ defmodule DoublyLinkedList do
   def get(%__MODULE__{} = dll, node_id) when is_binary(node_id), do: get_node(dll.nodes, node_id)
   def get(%__MODULE__{} = dll, %Node{} = node), do: get_node(dll.nodes, node)
 
+  def find_from_head(%__MODULE__{head: nil}, _data), do: nil
+
   def find_from_head(%__MODULE__{} = dll, data) do
-    head = get_node(dll.nodes, dll.head)
-    return_node_or_step_forwards(dll, head, data)
+    case get_node(dll.nodes, dll.head) do
+      nil -> nil
+      head -> return_node_or_step_forwards(dll, head, data)
+    end
   end
 
+  def find_from_tail(%__MODULE__{tail: nil}, _data), do: nil
+
   def find_from_tail(%__MODULE__{} = dll, data) do
-    tail = get_node(dll.nodes, dll.tail)
-    return_node_or_step_backwards(dll, tail, data)
+    case get_node(dll.nodes, dll.tail) do
+      nil -> nil
+      tail -> return_node_or_step_backwards(dll, tail, data)
+    end
   end
 
   def update(%__MODULE__{} = dll, node_id, data) when is_binary(node_id) do

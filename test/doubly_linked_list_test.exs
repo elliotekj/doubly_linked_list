@@ -280,6 +280,12 @@ defmodule DoublyLinkedListTest do
       assert is_nil(DLL.find_from_head(dll, "test101"))
     end
 
+    test "returns nil if the dll is empty" do
+      dll = DLL.new()
+      assert is_nil(DLL.find_from_head(dll, "test"))
+    end
+  end
+
   describe "find_from_tail/2" do
     test "returns the node or nil" do
       {dll, _tail_node} =
@@ -287,6 +293,11 @@ defmodule DoublyLinkedListTest do
 
       refute is_nil(DLL.find_from_tail(dll, "test86"))
       assert is_nil(DLL.find_from_tail(dll, "test101"))
+    end
+
+    test "returns nil if the dll is empty" do
+      dll = DLL.new()
+      assert is_nil(DLL.find_from_tail(dll, "test"))
     end
   end
   end
