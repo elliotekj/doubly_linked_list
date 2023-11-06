@@ -227,6 +227,15 @@ defmodule DoublyLinkedList do
     def slice(_dll), do: {:error, __MODULE__}
   end
 
+  defimpl Inspect, for: __MODULE__ do
+    import Inspect.Algebra
+
+    def inspect(%DoublyLinkedList{} = dll, opts) do
+      opts = %Inspect.Opts{opts | charlists: :as_lists}
+      concat(["#DoublyLinkedList<", Inspect.List.inspect(Enum.to_list(dll), opts), ">"])
+    end
+  end
+
   defp get_node(nodes, node_id) when is_binary(node_id), do: Map.get(nodes, node_id)
   defp get_node(nodes, %Node{id: id}), do: Map.get(nodes, id)
 
