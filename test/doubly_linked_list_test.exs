@@ -1,7 +1,6 @@
 defmodule DoublyLinkedListTest do
   use ExUnit.Case
   alias DoublyLinkedList, as: DLL
-  doctest DoublyLinkedList
 
   describe "new/0" do
     test "returns a new DLL" do

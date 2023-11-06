@@ -1,5 +1,11 @@
 defmodule DoublyLinkedList.Node do
+  @moduledoc """
+  A doubly linked list node.
+  """
+
   defstruct id: nil, prev: nil, next: nil, data: nil
+
+  @type t :: %__MODULE__{}
 
   def new(data, opts) do
     prev = opts[:prev]
