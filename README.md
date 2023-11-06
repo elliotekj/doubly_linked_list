@@ -25,7 +25,7 @@ end
 
 A new doubly linked list can be constructed using `new/0`:
 
-```
+```elixir
 iex> dll = DoublyLinkedList.new()
 #DoublyLinkedList<[]>
 ```
@@ -34,7 +34,7 @@ Many types of insertion and deletion are supported, the most basic being
 `insert_head/2`, `insert_tail/2`, `remove_head/1` and `remove_tail/2` which will
 insert and remove at the head and tail of the doubly linked list respectively:
 
-```
+```elixir
 iex> dll = DoublyLinkedList.new()
 #DoublyLinkedList<[]>
 
@@ -53,7 +53,7 @@ iex> dll = DoublyLinkedList.remove_head(dll)
 
 Node data can be updated with `update/3`:
 
-```
+```elixir
 iex> dll = DoublyLinkedList.new()
 #DoublyLinkedList<[]>
 
@@ -71,7 +71,7 @@ are also the built-in `find_from_head/2` and `find_from_tail/2` functions.
 `find_from_tail/2` is of particular interest as it traverses the list in
 reverse. Note that traversal methods are O(n).
 
-```
+```elixir
 iex> dll = DoublyLinkedList.new()
 iex> {dll, node} = DoublyLinkedList.insert_tail(dll, 1)
 iex> {dll, node} = DoublyLinkedList.insert_tail(dll, 2)
