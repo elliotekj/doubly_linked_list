@@ -22,7 +22,8 @@ defmodule DoublyLinkedList.MixProject do
   defp deps do
     [
       {:elixir_uuid, "~> 1.2"},
-      {:ex_doc, "~> 0.30.9"}
+      {:ex_doc, "~> 0.30.9"},
+      {:benchee, "~> 1.0", only: :dev}
     ]
   end
 end
