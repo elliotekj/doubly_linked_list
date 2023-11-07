@@ -41,7 +41,7 @@ defmodule DoublyLinkedList.MixProject do
 
   defp description do
     """
-    A fast, ammortised O(log n) doubly linked list implementation.
+    A fast, amortised O(log n) doubly linked list implementation.
     """
   end
 

@@ -1,6 +1,6 @@
 # Doubly Linked List
 
-**A fast, ammortised O(log n) doubly linked list implementation.**
+**A fast, amortised O(log n) doubly linked list implementation.**
 
 A doubly linked list is a type of linked list in which each node contains three
 elements: a data value, a pointer to the next node in the list, and a pointer to
